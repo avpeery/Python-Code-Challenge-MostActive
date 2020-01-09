@@ -35,27 +35,33 @@ Since there's a tie, the first was returned)
 def most_active(bio_data):
     """Find window of time when most authors were active."""
 
-    #declare start time for the window, set to the first start time in bio data
-    start_time = bio_data[0][1]
+    #create minefield for year 1900 - 1999
+    century = [0] * 100
 
-    #declare end time for the window, set to the first end time in bio data
-    end_time = bio_data[0][2]
+    #Add 1 in every year in century when someone is active
+    for person, start, end in bio_data:
+        for year in range(start, end+1):
+            century[year-1900] += 1
 
-    #loop through bio_data to find latest starting window for an author
-    for bio in bio_data:
+    #find time period when most authors were active
+    best = 0
+    in_best_time = True
+    best_start_time = 0
+    best_end_time = 100
 
-        if bio[1] > start_time:
+    for year, num_active in enumerate(century):
+        #replace best with active year if greater
+        if num_active > best: 
+            best = num_active
+            in_best_time = True
+            best_start_time = year
 
-            #replace start time if the author's start window is later
-            start_time = bio[1]
+        elif num_active < best and in_best_time: 
+            #no longer in best time period, find end
+            best_end_time = year - 1
+            in_best_time = False
 
-        if bio[2] < end_time:
-
-            #replace end time if the author's end window is earlier
-            end_time = bio[2]
-
-    return (start_time, end_time)
-
+    return (best_start_time + 1900, best_end_time + 1900)
 
 if __name__ == '__main__':
     import doctest
